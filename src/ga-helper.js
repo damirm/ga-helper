@@ -13,10 +13,11 @@
 var window = window || {},
     document = document || {};
 
-(function (window, document, undefined) {
-    'use strict';
+(function (window, document) {
+    "use strict";
     
-    var qsa = 'querySelectorAll',
+    var qsa = "querySelectorAll",
+        supportedTypes = ["pageview", "event"],
         $ = document[qsa],
         gaHelper = {
             trackDOM: function ($el) {
@@ -40,39 +41,43 @@ var window = window || {},
                     throw "Invalid selector or HTMLElement argument";
                 }
 
-                $el[qsa]('[data-ga]').forEach(function(el) {
+                $el[qsa]("[data-ga]").forEach(function(el) {
                     var d = function(key) { return el.dataset[key]; },
-                        type = d('gaType'),
+                        type = d("gaType"),
                         args = [];
-
+                    
+                    if (!~supportedTypes.indexOf(type)) {
+                        type = supportedTypes[0];
+                    }
+                    
                     switch(type) {
-                        case 'event':
-                            args = [d('gaCategory'), d('gaAction'), d('gaLabel'), d('gaValue')];
+                        case "event":
+                            args = [d("gaCategory"), d("gaAction"), d("gaLabel"), d("gaValue")];
                             break;
-                        case 'pageview':
-                            args = [d('gaPage'), d('gaTitle'), d('gaLocation')];
-                            break;
+                            
+                        case "pageview":
                         default:
-                            type = 'pageview';
+                            args = [d("gaPage"), d("gaTitle"), d("gaLocation")];
                             break;
                     }
 
-                    el.addEventListener('click', function() {
+                    el.addEventListener("click", function() {
                         self[type].apply(self, args);
                     });
                 });
             },
             pageview: function(page, title, location) {
                 if (window.ga) {
-                    ga('send', 'pageview', {
-                        'page': page,
-                        'title': title
+                    ga("send", "pageview", {
+                        "page": page,
+                        "title": title,
+                        "location": location
                     });
                 }
             },
             event: function(category, action, label, value) {
                 if (window.ga) {
-                    ga('send', 'event', category, action, label, value);
+                    ga("send", "event", category, action, label, value);
                 }
             }
         };
