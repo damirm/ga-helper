@@ -1,13 +1,11 @@
 /*
- * Usage: <a href="/" 
-                data-ga 
-                data-ga-type="event" 
-                data-ga-category="category" 
-                data-ga-action="action" 
-                data-ga-label="label" 
+ * Usage: <a href="/"
+                data-ga
+                data-ga-type="event"
+                data-ga-category="category"
+                data-ga-action="action"
+                data-ga-label="label"
                 data-ga-value="value">Test</a>
- *
- *
  */
 
 var window = window || {},
@@ -15,46 +13,48 @@ var window = window || {},
 
 (function (window, document) {
     "use strict";
-    
+
     var qsa = "querySelectorAll",
         supportedTypes = ["pageview", "event"],
         $ = document[qsa],
         gaHelper = {
             trackDOM: function ($el) {
                 var self = this;
-                
+
                 switch (typeof $el) {
                     case "string":
-                        $el = $($el);
+                        $el = $($el)[0];
                         break;
 
                     case "undefined":
                         $el = $("body")[0];
                         break;
-                        
+
                     default:
                         break;
                 }
-                
+
                 if ($el instanceof HTMLElement) {
                 } else {
                     throw "Invalid selector or HTMLElement argument";
                 }
 
-                $el[qsa]("[data-ga]").forEach(function(el) {
+                var els = Array.prototype.slice.call($el[qsa]("[data-ga]"));
+
+                els.forEach(function(el) {
                     var d = function(key) { return el.dataset[key]; },
                         type = d("gaType"),
                         args = [];
-                    
+
                     if (!~supportedTypes.indexOf(type)) {
                         type = supportedTypes[0];
                     }
-                    
+
                     switch(type) {
                         case "event":
                             args = [d("gaCategory"), d("gaAction"), d("gaLabel"), d("gaValue")];
                             break;
-                            
+
                         case "pageview":
                         default:
                             args = [d("gaPage"), d("gaTitle"), d("gaLocation")];
