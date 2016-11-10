@@ -16,7 +16,7 @@ var window = window || {},
 
     var qsa = "querySelectorAll",
         supportedTypes = ["pageview", "event"],
-        $ = document[qsa],
+        $ = document[qsa].bind(document),
         gaHelper = {
             trackDOM: function ($el) {
                 var self = this;
